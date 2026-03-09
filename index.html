@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jem — Path to Profitability</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --navy: #183247;
+  --coral: #ff697f;
+  --grey: #efefef;
+  --navy-90: rgba(24,50,71,0.9);
+  --navy-60: rgba(24,50,71,0.6);
+  --navy-30: rgba(24,50,71,0.3);
+  --navy-10: rgba(24,50,71,0.1);
+  --coral-20: rgba(255,105,127,0.2);
+  --green: #2ecc71;
+  --green-dark: #1a9c54;
+  --panel-width: 360px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--navy);
+  background: #fff;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: margin-left 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+body.panel-open {
+  margin-left: var(--panel-width);
+}
+
+/* ── Sensitivity Panel ── */
+.sens-toggle {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 200;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 10px;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: left 0.4s cubic-bezier(0.22,1,0.36,1), background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sens-toggle:hover { background: var(--coral); }
+body.panel-open .sens-toggle { left: var(--panel-width); }
+.sens-toggle svg {
+  width: 16px;
+  height: 16px;
+  transform: rotate(90deg);
+}
+
+.sens-panel {
+  position: fixed;
+  left: calc(-1 * var(--panel-width));
+  top: 0;
+  bottom: 0;
+  width: var(--panel-width);
+  background: var(--navy);
+  z-index: 190;
+  overflow-y: auto;
+  transition: left 0.4s cubic-bezier(0.22,1,0.36,1);
+  color: #fff;
+  padding: 0;
+}
+body.panel-open .sens-panel { left: 0; }
+
+.sens-panel::-webkit-scrollbar { width: 4px; }
+.sens-panel::-webkit-scrollbar-track { background: transparent; }
+.sens-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+.sp-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sp-header h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.sp-reset {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: background 0.2s;
+}
+.sp-reset:hover { background: rgba(255,255,255,0.15); }
+
+.sp-section {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sp-section-title {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--coral);
+  font-weight: 600;
+  margin-bottom: 0.9rem;
+}
+.sp-field {
+  margin-bottom: 0.85rem;
+}
+.sp-field:last-child { margin-bottom: 0; }
+.sp-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+}
+.sp-label .sp-val {
+  font-size: 0.75rem;
+  color: #fff;
+  font-weight: 600;
+}
+.sp-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.12);
+  outline: none;
+  cursor: pointer;
+}
+.sp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--coral);
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  transition: transform 0.15s;
+}
+.sp-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+.sp-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--coral);
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+
+.sp-ebitda-readout {
+  padding: 1.25rem 1.5rem;
+  background: rgba(255,255,255,0.04);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  position: sticky;
+  bottom: 0;
+}
+.sp-ebitda-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.4);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.sp-ebitda-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  transition: color 0.3s;
+}
+.sp-ebitda-value.positive { color: var(--green); }
+.sp-ebitda-value.negative { color: var(--coral); }
+.sp-ebitda-sub {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 0.2rem;
+}
+
+/* ── Navigation ── */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 0 2rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--navy-10);
+  transform: translateY(-100%);
+  transition: transform 0.4s ease;
+}
+nav.visible { transform: translateY(0); }
+nav .logo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+nav .nav-links { display: flex; gap: 1.5rem; }
+nav .nav-links a {
+  text-decoration: none;
+  color: var(--navy-60);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: color 0.2s;
+  letter-spacing: 0.01em;
+}
+nav .nav-links a:hover, nav .nav-links a.active { color: var(--navy); }
+
+/* ── Hero ── */
+.hero {
+  min-height: 100vh;
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 80vw;
+  height: 80vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,105,127,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,105,127,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 100px;
+  padding: 0.4rem 1.2rem;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.2s forwards;
+}
+.hero-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--coral);
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.hero h1 {
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  max-width: 800px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.4s forwards;
+}
+.hero h1 .coral { color: var(--coral); }
+.hero .hero-sub {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255,255,255,0.5);
+  margin-top: 1.5rem;
+  font-weight: 400;
+  max-width: 600px;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.6s forwards;
+}
+.hero .hero-timeline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 3rem;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.8s forwards;
+}
+.hero .timeline-point { text-align: center; }
+.hero .timeline-point .tp-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.4);
+  font-weight: 500;
+}
+.hero .timeline-point .tp-value {
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+.hero .timeline-line {
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.2), var(--coral), rgba(255,255,255,0.2));
+  position: relative;
+}
+.hero .timeline-line::after {
+  content: '16 months';
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  color: var(--coral);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.hero .scroll-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  animation: float 3s infinite ease-in-out;
+}
+.scroll-hint svg { width: 20px; height: 20px; }
+@keyframes float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Sections ── */
+section {
+  padding: 6rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--coral);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+.section-title {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+.section-desc {
+  font-size: 1.05rem;
+  color: var(--navy-60);
+  max-width: 640px;
+  line-height: 1.65;
+  margin-bottom: 3rem;
+}
+
+/* ── Reveal animation ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Financial Summary Cards ── */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.summary-card {
+  background: #fff;
+  border: 1px solid var(--navy-10);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(24,50,71,0.08);
+}
+.summary-card.highlight {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.summary-card .sc-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--navy-60);
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+.summary-card.highlight .sc-label { color: rgba(255,255,255,0.5); }
+.summary-card .sc-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.summary-card .sc-sub {
+  font-size: 0.78rem;
+  color: var(--navy-30);
+  margin-top: 0.35rem;
+}
+.summary-card.highlight .sc-sub { color: rgba(255,255,255,0.4); }
+.sc-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+.sc-change.up {
+  background: rgba(46,204,113,0.12);
+  color: var(--green-dark);
+}
+.sc-change.positive {
+  background: var(--coral-20);
+  color: var(--coral);
+}
+
+/* ── Comparison Table ── */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+}
+.comparison-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--navy-60);
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--navy-10);
+}
+.comparison-table td {
+  padding: 0.85rem 1rem;
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--navy-10);
+}
+.comparison-table tr:last-child td { border-bottom: none; }
+.comparison-table .metric-name { font-weight: 500; }
+.comparison-table .mono {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.comparison-table .change-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(46,204,113,0.1);
+  color: var(--green-dark);
+}
+.comparison-table tr.total-row td {
+  font-weight: 700;
+  border-top: 2px solid var(--navy);
+  border-bottom: none;
+}
+.comparison-table tr.total-row .ebitda-positive {
+  color: var(--green-dark);
+  font-size: 1rem;
+}
+
+/* ── People callout ── */
+.callout {
+  background: var(--grey);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-top: 2rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+.callout-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+  font-size: 1.1rem;
+}
+.callout-text {
+  font-size: 0.88rem;
+  color: var(--navy-60);
+  line-height: 1.6;
+}
+.callout-text strong { color: var(--navy); }
+.callout-numbers {
+  display: flex;
+  gap: 2rem;
+  margin-top: 0.75rem;
+}
+.callout-numbers .cn { display: flex; flex-direction: column; }
+.callout-numbers .cn-val {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+.callout-numbers .cn-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--navy-30);
+  font-weight: 500;
+}
+
+/* ── KU Section ── */
+.ku-section {
+  background: var(--grey);
+  padding: 6rem 2rem;
+  max-width: none;
+}
+.ku-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.ku-gauge-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-top: 2rem;
+}
+.ku-visual { position: relative; }
+.ku-bar-track {
+  width: 100%;
+  height: 48px;
+  background: rgba(24,50,71,0.08);
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.ku-bar-fill {
+  height: 100%;
+  border-radius: 24px;
+  background: linear-gradient(90deg, var(--navy), var(--coral));
+  width: 0%;
+  transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+.ku-bar-fill.animated { width: var(--ku-pct); }
+.ku-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  position: relative;
+}
+.ku-bar-labels span {
+  font-size: 0.75rem;
+  color: var(--navy-60);
+  font-weight: 500;
+}
+.ku-bar-labels .ku-current-label {
+  position: absolute;
+  left: 59.3%;
+  transform: translateX(-50%);
+  font-weight: 600;
+  color: var(--navy);
+}
+.ku-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+.ku-stat {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.ku-stat .ks-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--navy);
+  font-variant-numeric: tabular-nums;
+}
+.ku-stat .ks-label {
+  font-size: 0.78rem;
+  color: var(--navy-60);
+  margin-top: 0.25rem;
+}
+.ku-stat .ks-context {
+  font-size: 0.72rem;
+  color: var(--navy-30);
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+/* ── Product Breakdown ── */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+.product-card {
+  background: #fff;
+  border: 1px solid var(--navy-10);
+  border-radius: 14px;
+  padding: 1.75rem;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(24,50,71,0.08);
+}
+.product-card .pc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+.product-card .pc-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.product-card .pc-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  background: var(--coral-20);
+  color: var(--coral);
+}
+.product-card .pc-revenue-bar { margin-bottom: 1.25rem; }
+.pc-bar-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--navy-60);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+.pc-bar-track {
+  height: 8px;
+  background: var(--grey);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.pc-bar-current {
+  height: 100%;
+  background: var(--navy-30);
+  border-radius: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: width 1s ease;
+}
+.pc-bar-target {
+  height: 100%;
+  background: linear-gradient(90deg, var(--navy), var(--coral));
+  border-radius: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: width 1.2s 0.2s ease;
+  opacity: 0.3;
+}
+.product-card .pc-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+.pc-metric { display: flex; flex-direction: column; }
+.pc-metric .pcm-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--navy-30);
+  font-weight: 500;
+}
+.pc-metric .pcm-values {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.pc-metric .pcm-current {
+  font-size: 0.82rem;
+  color: var(--navy-60);
+  font-weight: 500;
+}
+.pc-metric .pcm-arrow {
+  color: var(--navy-30);
+  font-size: 0.7rem;
+}
+.pc-metric .pcm-target {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* ── Waterfall / P&L Bridge ── */
+.bridge-section {
+  background: var(--navy);
+  padding: 6rem 2rem;
+  max-width: none;
+}
+.bridge-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.bridge-section .section-label { color: var(--coral); }
+.bridge-section .section-title { color: #fff; }
+.bridge-section .section-desc { color: rgba(255,255,255,0.45); }
+
+.waterfall {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2rem;
+  height: 320px;
+  margin-top: 3rem;
+  position: relative;
+  padding-bottom: 60px;
+}
+.waterfall::before {
+  content: '';
+  position: absolute;
+  bottom: 59px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+}
+.wf-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 180px;
+  position: relative;
+}
+.wf-bar {
+  width: 64px;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  transition: height 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  height: 0;
+}
+.wf-bar.revenue { background: rgba(255,255,255,0.2); }
+.wf-bar.gp { background: rgba(46,204,113,0.5); }
+.wf-bar.opex { background: rgba(255,105,127,0.5); }
+.wf-bar.ebitda {
+  background: linear-gradient(180deg, var(--coral), #ff8fa0);
+  box-shadow: 0 0 30px rgba(255,105,127,0.4);
+}
+.wf-bar.ebitda.negative-ebitda {
+  background: linear-gradient(180deg, #ff4060, var(--coral));
+  box-shadow: 0 0 30px rgba(255,64,96,0.4);
+}
+
+.wf-value {
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.5s 1s;
+  font-variant-numeric: tabular-nums;
+}
+.wf-value.visible { opacity: 1; }
+.wf-label {
+  position: absolute;
+  bottom: -45px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── EBITDA celebration ── */
+.ebitda-hero {
+  text-align: center;
+  margin-top: 4rem;
+  padding: 3rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.ebitda-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--coral), transparent);
+}
+.ebitda-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4);
+  font-weight: 600;
+}
+.ebitda-value {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  color: var(--coral);
+  margin-top: 0.5rem;
+  letter-spacing: -0.02em;
+  transition: color 0.3s;
+  font-variant-numeric: tabular-nums;
+}
+.ebitda-value.negative { color: #ff4060; }
+.ebitda-sub {
+  font-size: 0.92rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 0.75rem;
+}
+.ebitda-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ── Guardrail banner ── */
+.guardrail {
+  background: var(--grey);
+  padding: 4rem 2rem;
+  text-align: center;
+  max-width: none;
+}
+.guardrail-inner {
+  max-width: 700px;
+  margin: 0 auto;
+}
+.guardrail .g-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--coral);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.guardrail .g-text {
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+}
+.guardrail .g-text .coral { color: var(--coral); }
+
+/* ── Revenue chart ── */
+.chart-container {
+  background: #fff;
+  border: 1px solid var(--navy-10);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+.chart-container canvas { max-height: 400px; }
+
+/* ── Sensitivity modified indicator ── */
+.sens-modified {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--coral-20);
+  border: 1px solid rgba(255,105,127,0.3);
+  border-radius: 100px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--coral);
+  margin-bottom: 1.5rem;
+}
+.sens-modified.show { display: inline-flex; }
+.sens-modified .sm-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  :root { --panel-width: 300px; }
+  .summary-grid { grid-template-columns: 1fr 1fr; }
+  .ku-gauge-container { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: 1fr; }
+  .waterfall { gap: 1rem; height: 220px; }
+  .wf-bar { width: 48px; }
+  .callout { flex-direction: column; }
+  .callout-numbers { gap: 1rem; }
+  nav .nav-links { display: none; }
+  .hero .timeline-line { width: 60px; }
+  section { padding: 4rem 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  :root { --panel-width: 280px; }
+  .summary-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Sensitivity Panel -->
+<button class="sens-toggle" id="sensToggle" title="Sensitivity Analysis">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M6 20V4"/><path d="M18 20v-6"/></svg>
+  Sensitivity
+</button>
+
+<div class="sens-panel" id="sensPanel">
+  <div class="sp-header">
+    <h3>Sensitivity Analysis</h3>
+    <button class="sp-reset" id="sensReset">Reset</button>
+  </div>
+
+  <div class="sp-section">
+    <div class="sp-section-title">Known Universe</div>
+    <div class="sp-field">
+      <div class="sp-label">
+        <span>Total KU Target</span>
+        <span class="sp-val" id="valKU">400,000</span>
+      </div>
+      <input type="range" class="sp-slider" id="slKU" min="250000" max="600000" step="5000" value="400000">
+    </div>
+  </div>
+
+  <div class="sp-section">
+    <div class="sp-section-title">Access Rates</div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Jem OS</span><span class="sp-val" id="valArOS">95%</span></div>
+      <input type="range" class="sp-slider" id="slArOS" min="50" max="100" step="1" value="95">
+    </div>
+    <div class="sp-field">
+      <div class="sp-label"><span>EWA</span><span class="sp-val" id="valArEWA">52%</span></div>
+      <input type="range" class="sp-slider" id="slArEWA" min="20" max="80" step="1" value="52">
+    </div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Mobile</span><span class="sp-val" id="valArMob">35%</span></div>
+      <input type="range" class="sp-slider" id="slArMob" min="10" max="70" step="1" value="35">
+    </div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Insurance</span><span class="sp-val" id="valArIns">10%</span></div>
+      <input type="range" class="sp-slider" id="slArIns" min="0" max="30" step="1" value="10">
+    </div>
+  </div>
+
+  <div class="sp-section">
+    <div class="sp-section-title">ARPKU (R)</div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Jem OS</span><span class="sp-val" id="valApOS">R7.00</span></div>
+      <input type="range" class="sp-slider" id="slApOS" min="200" max="1500" step="10" value="700">
+    </div>
+    <div class="sp-field">
+      <div class="sp-label"><span>EWA</span><span class="sp-val" id="valApEWA">R38.00</span></div>
+      <input type="range" class="sp-slider" id="slApEWA" min="1500" max="6000" step="50" value="3800">
+    </div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Mobile</span><span class="sp-val" id="valApMob">R25.00</span></div>
+      <input type="range" class="sp-slider" id="slApMob" min="500" max="6000" step="50" value="2500">
+    </div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Insurance</span><span class="sp-val" id="valApIns">R4.00</span></div>
+      <input type="range" class="sp-slider" id="slApIns" min="100" max="1500" step="10" value="400">
+    </div>
+  </div>
+
+  <div class="sp-section">
+    <div class="sp-section-title">Gross Margins</div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Jem OS</span><span class="sp-val" id="valGmOS">85%</span></div>
+      <input type="range" class="sp-slider" id="slGmOS" min="40" max="100" step="1" value="85">
+    </div>
+    <div class="sp-field">
+      <div class="sp-label"><span>EWA</span><span class="sp-val" id="valGmEWA">75%</span></div>
+      <input type="range" class="sp-slider" id="slGmEWA" min="40" max="90" step="1" value="75">
+    </div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Mobile</span><span class="sp-val" id="valGmMob">42%</span></div>
+      <input type="range" class="sp-slider" id="slGmMob" min="10" max="70" step="1" value="42">
+    </div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Insurance</span><span class="sp-val" id="valGmIns">100%</span></div>
+      <input type="range" class="sp-slider" id="slGmIns" min="50" max="100" step="1" value="100">
+    </div>
+  </div>
+
+  <div class="sp-section">
+    <div class="sp-section-title">JemX / Services</div>
+    <div class="sp-field">
+      <div class="sp-label"><span>Revenue</span><span class="sp-val" id="valJemXRev">R200k</span></div>
+      <input type="range" class="sp-slider" id="slJemXRev" min="0" max="2000000" step="25000" value="200000">
+    </div>
+  </div>
+
+  <div class="sp-ebitda-readout">
+    <div class="sp-ebitda-label">Projected EBITDA</div>
+    <div class="sp-ebitda-value positive" id="panelEbitda">R49,540</div>
+    <div class="sp-ebitda-sub" id="panelEbitdaSub">Above breakeven</div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav id="nav">
+  <div class="logo">Jem</div>
+  <div class="nav-links">
+    <a href="#snapshot">Snapshot</a>
+    <a href="#growth">Growth</a>
+    <a href="#products">Products</a>
+    <a href="#bridge">P&L Bridge</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+  <div class="hero-badge"><span class="dot"></span> Board Presentation</div>
+  <h1>Path to <span class="coral">Profitability</span></h1>
+  <p class="hero-sub">A clear, sustainable roadmap to EBITDA-positive by June 2027, without compromising our path to $10m EBITDA by 2030.</p>
+  <div class="hero-timeline">
+    <div class="timeline-point">
+      <div class="tp-label">Today</div>
+      <div class="tp-value">Feb 2026</div>
+    </div>
+    <div class="timeline-line"></div>
+    <div class="timeline-point">
+      <div class="tp-label">Target</div>
+      <div class="tp-value" style="color: var(--coral);">Jun 2027</div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- Financial Snapshot -->
+<section id="snapshot">
+  <div class="reveal">
+    <div class="section-label">Financial Snapshot</div>
+    <h2 class="section-title">Where we are today vs<br>where we need to be</h2>
+    <p class="section-desc">Revenue needs to grow 3.2x while operating costs grow just 1.6x. The operating leverage is the story.</p>
+    <div class="sens-modified" id="sensModifiedBadge"><span class="sm-dot"></span> Sensitivity adjusted</div>
+  </div>
+
+  <div class="summary-grid reveal">
+    <div class="summary-card">
+      <div class="sc-label">Revenue</div>
+      <div class="sc-value" id="scRevenue">R4.5m</div>
+      <div class="sc-sub">Feb 2026</div>
+      <div class="sc-change up" id="scRevenueChange">+219% to R14.3m</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Gross Margin</div>
+      <div class="sc-value" id="scGM">63%</div>
+      <div class="sc-sub">Feb 2026</div>
+      <div class="sc-change up" id="scGMChange">+6pp to 69%</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Operating Costs</div>
+      <div class="sc-value">R6.3m</div>
+      <div class="sc-sub">Feb 2026</div>
+      <div class="sc-change up">+56% to R9.9m</div>
+    </div>
+    <div class="summary-card highlight">
+      <div class="sc-label">EBITDA</div>
+      <div class="sc-value" id="scEBITDA" style="color: var(--coral);">-R3.5m</div>
+      <div class="sc-sub">Feb 2026</div>
+      <div class="sc-change positive" id="scEBITDAChange">Near breakeven at -R17k</div>
+    </div>
+  </div>
+
+  <!-- Detailed table -->
+  <div class="reveal" style="margin-top: 2rem;">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>End of Feb 2026</th>
+          <th>At Profitability</th>
+          <th>Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="metric-name">Revenue</td>
+          <td class="mono">R4,474,520</td>
+          <td class="mono" id="tblRevenue">R14,275,257</td>
+          <td><span class="change-badge" id="tblRevenueChg">+219%</span></td>
+        </tr>
+        <tr>
+          <td class="metric-name">Gross Margin</td>
+          <td class="mono">63%</td>
+          <td class="mono" id="tblGM">69%</td>
+          <td><span class="change-badge" id="tblGMChg">+6pp</span></td>
+        </tr>
+        <tr>
+          <td class="metric-name">Gross Profit</td>
+          <td class="mono">R2,824,256</td>
+          <td class="mono" id="tblGP">R9,863,239</td>
+          <td><span class="change-badge" id="tblGPChg">+249%</span></td>
+        </tr>
+        <tr>
+          <td class="metric-name">Total Operating Costs</td>
+          <td class="mono">R6,325,936</td>
+          <td class="mono">R9,880,086</td>
+          <td><span class="change-badge">+56%</span></td>
+        </tr>
+        <tr>
+          <td class="metric-name" style="padding-left: 2rem; color: var(--navy-60);">People Costs</td>
+          <td class="mono" style="color: var(--navy-60);">R3,627,307</td>
+          <td class="mono" style="color: var(--navy-60);">R5,193,314</td>
+          <td><span class="change-badge">+43%</span></td>
+        </tr>
+        <tr>
+          <td class="metric-name" style="padding-left: 2rem; color: var(--navy-60);">AI Costs</td>
+          <td class="mono" style="color: var(--navy-60);">R277,812</td>
+          <td class="mono" style="color: var(--navy-60);">R845,250</td>
+          <td><span class="change-badge">+204%</span></td>
+        </tr>
+        <tr>
+          <td class="metric-name" style="padding-left: 2rem; color: var(--navy-60);">Other Operating Costs</td>
+          <td class="mono" style="color: var(--navy-60);">R2,420,818</td>
+          <td class="mono" style="color: var(--navy-60);">R3,841,522</td>
+          <td><span class="change-badge">+59%</span></td>
+        </tr>
+        <tr class="total-row">
+          <td class="metric-name">EBITDA / Net Burn</td>
+          <td class="mono" style="color: var(--coral);">-R3,501,680</td>
+          <td class="mono" id="tblEBITDA" style="color: var(--coral);">-R16,847</td>
+          <td><span class="change-badge" id="tblEBITDAChg" style="background: var(--coral-20); color: var(--coral);">Near breakeven</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- People callout -->
+  <div class="callout reveal">
+    <div class="callout-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div>
+      <div class="callout-text">
+        <strong>People costs increase by ~R1.5m</strong>, but this includes hires already made and not yet started: Head of Jem Mobile, Senior CSM, Head of CS, Senior Product Engineer. Hiring pipeline after these is very lean.
+      </div>
+      <div class="callout-numbers">
+        <div class="cn">
+          <div class="cn-val">48</div>
+          <div class="cn-label">Current FTE</div>
+        </div>
+        <div class="cn">
+          <div class="cn-val">~60</div>
+          <div class="cn-label">At Profitability</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KU Growth -->
+<section class="ku-section" id="growth">
+  <div class="ku-inner">
+    <div class="reveal">
+      <div class="section-label">Known Universe Growth</div>
+      <h2 class="section-title" id="kuTitle">163k new KU to profitability</h2>
+      <p class="section-desc" id="kuDesc">We added 72,000 KU in the last six months. We need to more than double that rate to reach 400k.</p>
+    </div>
+
+    <div class="ku-gauge-container reveal">
+      <div class="ku-visual">
+        <div class="ku-bar-track">
+          <div class="ku-bar-fill" id="kuBar" style="--ku-pct: 59.3%;"></div>
+        </div>
+        <div class="ku-bar-labels">
+          <span>0</span>
+          <span class="ku-current-label">237k</span>
+          <span id="kuTargetLabel">400k</span>
+        </div>
+      </div>
+      <div class="ku-stats">
+        <div class="ku-stat">
+          <div class="ks-value">237,172</div>
+          <div class="ks-label">Current KU</div>
+        </div>
+        <div class="ku-stat">
+          <div class="ks-value" id="kuTargetStat">400,000</div>
+          <div class="ks-label">Target KU</div>
+        </div>
+        <div class="ku-stat">
+          <div class="ks-value" id="kuNewRequired" style="color: var(--coral);">162,828</div>
+          <div class="ks-label">New KU Required</div>
+        </div>
+        <div class="ku-stat">
+          <div class="ks-value">72,000</div>
+          <div class="ks-label">Added Last 6 Months</div>
+          <div class="ks-context">Sep 2025 to Feb 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Product Breakdown -->
+<section id="products">
+  <div class="reveal">
+    <div class="section-label">Product Revenue Breakdown</div>
+    <h2 class="section-title">Five products, one target</h2>
+    <p class="section-desc">Each product has a distinct growth trajectory. EWA and Mobile drive the majority of incremental revenue.</p>
+  </div>
+
+  <div class="chart-container reveal">
+    <canvas id="revenueChart"></canvas>
+  </div>
+
+  <div class="product-grid reveal" id="productGrid">
+    <!-- Jem OS -->
+    <div class="product-card" id="cardOS">
+      <div class="pc-header">
+        <div class="pc-name">Jem OS</div>
+        <div class="pc-badge" id="badgeOS">+231% rev</div>
+      </div>
+      <div class="pc-revenue-bar">
+        <div class="pc-bar-header">
+          <span>R800k</span>
+          <span id="barTargetOS">R2.6m target</span>
+        </div>
+        <div class="pc-bar-track" style="position: relative;">
+          <div class="pc-bar-target" id="barFillTargetOS" style="width: 100%;"></div>
+          <div class="pc-bar-current" id="barFillCurrentOS" style="width: 30%;"></div>
+        </div>
+      </div>
+      <div class="pc-metrics">
+        <div class="pc-metric"><div class="pcm-label">Access Rate</div><div class="pcm-values"><span class="pcm-current">95%</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metOSAccess">95%</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">KU</div><div class="pcm-values"><span class="pcm-current">224k</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metOSKU">378k</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">ARPKU</div><div class="pcm-values"><span class="pcm-current">R3.57</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metOSArpku">R7.00</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">Gross Margin</div><div class="pcm-values"><span class="pcm-current">70%</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metOSGM">85%</span></div></div>
+      </div>
+    </div>
+
+    <!-- EWA -->
+    <div class="product-card" id="cardEWA">
+      <div class="pc-header">
+        <div class="pc-name">EWA</div>
+        <div class="pc-badge" id="badgeEWA">+154% rev</div>
+      </div>
+      <div class="pc-revenue-bar">
+        <div class="pc-bar-header">
+          <span>R3.1m</span>
+          <span id="barTargetEWA">R7.8m target</span>
+        </div>
+        <div class="pc-bar-track" style="position: relative;">
+          <div class="pc-bar-target" id="barFillTargetEWA" style="width: 100%;"></div>
+          <div class="pc-bar-current" id="barFillCurrentEWA" style="width: 39%;"></div>
+        </div>
+      </div>
+      <div class="pc-metrics">
+        <div class="pc-metric"><div class="pcm-label">Access Rate</div><div class="pcm-values"><span class="pcm-current">42%</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metEWAAccess">52%</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">KU</div><div class="pcm-values"><span class="pcm-current">99k</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metEWAKU">208k</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">ARPKU</div><div class="pcm-values"><span class="pcm-current">R31.01</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metEWAArpku">R38.00</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">Gross Margin</div><div class="pcm-values"><span class="pcm-current">68%</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metEWAGM">75%</span></div></div>
+      </div>
+    </div>
+
+    <!-- Mobile -->
+    <div class="product-card" id="cardMob">
+      <div class="pc-header">
+        <div class="pc-name">Mobile</div>
+        <div class="pc-badge" id="badgeMob" style="background: rgba(46,204,113,0.15); color: var(--green-dark);">+530% rev</div>
+      </div>
+      <div class="pc-revenue-bar">
+        <div class="pc-bar-header">
+          <span>R556k</span>
+          <span id="barTargetMob">R3.5m target</span>
+        </div>
+        <div class="pc-bar-track" style="position: relative;">
+          <div class="pc-bar-target" id="barFillTargetMob" style="width: 100%;"></div>
+          <div class="pc-bar-current" id="barFillCurrentMob" style="width: 16%;"></div>
+        </div>
+      </div>
+      <div class="pc-metrics">
+        <div class="pc-metric"><div class="pcm-label">Access Rate</div><div class="pcm-values"><span class="pcm-current">26%</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metMobAccess">35%</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">KU</div><div class="pcm-values"><span class="pcm-current">61k</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metMobKU">140k</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">ARPKU</div><div class="pcm-values"><span class="pcm-current">R9.18</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metMobArpku">R25.00</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">Gross Margin</div><div class="pcm-values"><span class="pcm-current">25%</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metMobGM">42%</span></div></div>
+      </div>
+    </div>
+
+    <!-- JemX / Services -->
+    <div class="product-card" id="cardJemX">
+      <div class="pc-header">
+        <div class="pc-name">JemX / Services</div>
+        <div class="pc-badge" id="badgeJemX">+400% rev</div>
+      </div>
+      <div class="pc-revenue-bar">
+        <div class="pc-bar-header">
+          <span>R40k</span>
+          <span id="barTargetJemX">R200k target</span>
+        </div>
+        <div class="pc-bar-track" style="position: relative;">
+          <div class="pc-bar-target" id="barFillTargetJemX" style="width: 100%;"></div>
+          <div class="pc-bar-current" id="barFillCurrentJemX" style="width: 20%;"></div>
+        </div>
+      </div>
+      <div class="pc-metrics">
+        <div class="pc-metric"><div class="pcm-label">Revenue</div><div class="pcm-values"><span class="pcm-current">R40k</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metJemXRev">R200k</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">Gross Margin</div><div class="pcm-values"><span class="pcm-current">100%</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target">100%</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">Gross Profit</div><div class="pcm-values"><span class="pcm-current">R0</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metJemXGP">R200k</span></div></div>
+      </div>
+    </div>
+
+    <!-- Insurance -->
+    <div class="product-card" id="cardIns">
+      <div class="pc-header">
+        <div class="pc-name">Insurance</div>
+        <div class="pc-badge" id="badgeIns" style="background: var(--navy-10); color: var(--navy-60);">New product</div>
+      </div>
+      <div class="pc-revenue-bar">
+        <div class="pc-bar-header">
+          <span>R0</span>
+          <span id="barTargetIns">R160k target</span>
+        </div>
+        <div class="pc-bar-track" style="position: relative;">
+          <div class="pc-bar-target" id="barFillTargetIns" style="width: 100%;"></div>
+          <div class="pc-bar-current" id="barFillCurrentIns" style="width: 0%;"></div>
+        </div>
+      </div>
+      <div class="pc-metrics">
+        <div class="pc-metric"><div class="pcm-label">Access Rate</div><div class="pcm-values"><span class="pcm-current">0%</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metInsAccess">10%</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">KU</div><div class="pcm-values"><span class="pcm-current">0</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metInsKU">40k</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">ARPKU</div><div class="pcm-values"><span class="pcm-current">R0</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metInsArpku">R4.00</span></div></div>
+        <div class="pc-metric"><div class="pcm-label">Gross Margin</div><div class="pcm-values"><span class="pcm-current">0%</span><span class="pcm-arrow">&rarr;</span><span class="pcm-target" id="metInsGM">100%</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- P&L Bridge -->
+<section class="bridge-section" id="bridge">
+  <div class="bridge-inner">
+    <div class="reveal">
+      <div class="section-label">P&L Bridge at Profitability</div>
+      <h2 class="section-title">The bottom line</h2>
+      <p class="section-desc" id="bridgeDesc">R14.3m revenue, 69% gross margin, lean opex. Near breakeven.</p>
+    </div>
+
+    <div class="waterfall reveal" id="waterfall">
+      <div class="wf-item">
+        <div class="wf-value" id="wfRevVal">R14.3m</div>
+        <div class="wf-bar revenue" id="wfRev"></div>
+        <div class="wf-label">Revenue</div>
+      </div>
+      <div class="wf-item">
+        <div class="wf-value" id="wfGpVal">R9.9m</div>
+        <div class="wf-bar gp" id="wfGp"></div>
+        <div class="wf-label">Gross Profit</div>
+      </div>
+      <div class="wf-item">
+        <div class="wf-value" id="wfOpexVal">-R9.9m</div>
+        <div class="wf-bar opex" id="wfOpex"></div>
+        <div class="wf-label">Operating Expenses</div>
+      </div>
+      <div class="wf-item">
+        <div class="wf-value" id="wfEbitdaVal">R50k</div>
+        <div class="wf-bar ebitda" id="wfEbitda"></div>
+        <div class="wf-label">EBITDA</div>
+      </div>
+    </div>
+
+    <div class="ebitda-hero reveal" id="ebitdaCelebration">
+      <div class="ebitda-particles" id="particles"></div>
+      <div class="ebitda-label" id="ebitdaLabel">Monthly EBITDA at Profitability</div>
+      <div class="ebitda-value" id="ebitdaValue">R49,540</div>
+      <div class="ebitda-sub" id="ebitdaSub">Near breakeven. The inflection point.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Guardrail -->
+<section class="guardrail">
+  <div class="guardrail-inner reveal">
+    <div class="g-label">Guardrail</div>
+    <p class="g-text">Decisions made to get to profitability as quickly as possible must not negatively impact our BHAG of <span class="coral">$10m EBITDA by 2030</span>.</p>
+  </div>
+</section>
+
+<script>
+// ── Constants ──
+const CURRENT_KU = 237172;
+const CURRENT_REVENUE = 4474520;
+const CURRENT_GP = 2824256;
+const OPEX = 9880086;
+const JEMX_GM = 1.00;
+
+// Current product data
+const CURRENT = {
+  os: { rev: 799755, gp: 559871 },
+  ewa: { rev: 3069956, gp: 2081487 },
+  mob: { rev: 555729, gp: 136742 },
+  jemx: { rev: 40000, gp: 0 },
+  ins: { rev: 0, gp: 0 }
+};
+
+// ── Default values (updated from model) ──
+const DEFAULTS = {
+  ku: 400000,
+  arOS: 95, arEWA: 52, arMob: 35, arIns: 10,
+  apOS: 700, apEWA: 3800, apMob: 2500, apIns: 400,
+  gmOS: 85, gmEWA: 75, gmMob: 42, gmIns: 100,
+  jemxRev: 200000
+};
+
+// ── Panel toggle ──
+document.getElementById('sensToggle').addEventListener('click', () => {
+  document.body.classList.toggle('panel-open');
+});
+
+// ── Slider references ──
+const sliders = {
+  ku: document.getElementById('slKU'),
+  arOS: document.getElementById('slArOS'),
+  arEWA: document.getElementById('slArEWA'),
+  arMob: document.getElementById('slArMob'),
+  arIns: document.getElementById('slArIns'),
+  apOS: document.getElementById('slApOS'),
+  apEWA: document.getElementById('slApEWA'),
+  apMob: document.getElementById('slApMob'),
+  apIns: document.getElementById('slApIns'),
+  gmOS: document.getElementById('slGmOS'),
+  gmEWA: document.getElementById('slGmEWA'),
+  gmMob: document.getElementById('slGmMob'),
+  gmIns: document.getElementById('slGmIns'),
+  jemxRev: document.getElementById('slJemXRev')
+};
+
+const valDisplays = {
+  ku: document.getElementById('valKU'),
+  arOS: document.getElementById('valArOS'),
+  arEWA: document.getElementById('valArEWA'),
+  arMob: document.getElementById('valArMob'),
+  arIns: document.getElementById('valArIns'),
+  apOS: document.getElementById('valApOS'),
+  apEWA: document.getElementById('valApEWA'),
+  apMob: document.getElementById('valApMob'),
+  apIns: document.getElementById('valApIns'),
+  gmOS: document.getElementById('valGmOS'),
+  gmEWA: document.getElementById('valGmEWA'),
+  gmMob: document.getElementById('valGmMob'),
+  gmIns: document.getElementById('valGmIns'),
+  jemxRev: document.getElementById('valJemXRev')
+};
+
+// ── Formatting helpers ──
+function fmtR(n) {
+  const abs = Math.abs(n);
+  if (abs >= 1000000) return (n < 0 ? '-' : '') + 'R' + (abs / 1000000).toFixed(1) + 'm';
+  if (abs >= 1000) return (n < 0 ? '-' : '') + 'R' + Math.round(abs / 1000) + 'k';
+  return (n < 0 ? '-' : '') + 'R' + Math.round(abs);
+}
+function fmtRFull(n) {
+  const abs = Math.abs(n);
+  return (n < 0 ? '-R' : 'R') + Math.round(abs).toLocaleString();
+}
+function fmtK(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'm';
+  if (n >= 1000) return Math.round(n / 1000) + 'k';
+  return Math.round(n).toString();
+}
+function fmtPct(n) { return Math.round(n) + '%'; }
+function chgPct(cur, tgt) {
+  if (cur === 0) return tgt > 0 ? 'New' : '0%';
+  return (tgt >= cur ? '+' : '') + Math.round((tgt - cur) / cur * 100) + '%';
+}
+
+// ── Revenue Chart ──
+const ctx = document.getElementById('revenueChart').getContext('2d');
+const navy = '#183247';
+const coral = '#ff697f';
+
+const revenueChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['Jem OS', 'EWA', 'Mobile', 'JemX / Services', 'Insurance'],
+    datasets: [
+      {
+        label: 'Current Revenue',
+        data: [799755, 3069956, 555729, 40000, 0],
+        backgroundColor: 'rgba(24,50,71,0.15)',
+        borderColor: navy,
+        borderWidth: 1.5,
+        borderRadius: 4,
+        barPercentage: 0.7,
+        categoryPercentage: 0.65,
+      },
+      {
+        label: 'Target Revenue',
+        data: [2646619, 7800000, 3500000, 200000, 160000],
+        backgroundColor: 'rgba(255,105,127,0.15)',
+        borderColor: coral,
+        borderWidth: 1.5,
+        borderRadius: 4,
+        barPercentage: 0.7,
+        categoryPercentage: 0.65,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 2.2,
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+      legend: {
+        position: 'top',
+        align: 'end',
+        labels: {
+          usePointStyle: true,
+          pointStyle: 'rectRounded',
+          padding: 20,
+          font: { family: "'DM Sans'", size: 12, weight: '500' },
+          color: navy,
+        }
+      },
+      tooltip: {
+        backgroundColor: navy,
+        titleFont: { family: "'DM Sans'", size: 13, weight: '600' },
+        bodyFont: { family: "'DM Sans'", size: 12 },
+        padding: 12,
+        cornerRadius: 8,
+        callbacks: {
+          label: function(context) {
+            return context.dataset.label + ': R' + context.parsed.y.toLocaleString();
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { family: "'DM Sans'", size: 12, weight: '500' }, color: navy },
+        border: { display: false },
+      },
+      y: {
+        grid: { color: 'rgba(24,50,71,0.06)' },
+        ticks: {
+          font: { family: "'DM Sans'", size: 11 },
+          color: 'rgba(24,50,71,0.4)',
+          callback: function(value) {
+            if (value >= 1000000) return 'R' + (value / 1000000).toFixed(1) + 'm';
+            if (value >= 1000) return 'R' + (value / 1000) + 'k';
+            return 'R' + value;
+          }
+        },
+        border: { display: false },
+      }
+    }
+  }
+});
+
+// ── Recalculate everything ──
+function recalculate() {
+  const v = {};
+  for (const key in sliders) {
+    v[key] = parseFloat(sliders[key].value);
+  }
+
+  // Update slider value displays
+  valDisplays.ku.textContent = Math.round(v.ku).toLocaleString();
+  valDisplays.arOS.textContent = fmtPct(v.arOS);
+  valDisplays.arEWA.textContent = fmtPct(v.arEWA);
+  valDisplays.arMob.textContent = fmtPct(v.arMob);
+  valDisplays.arIns.textContent = fmtPct(v.arIns);
+  valDisplays.apOS.textContent = 'R' + (v.apOS / 100).toFixed(2);
+  valDisplays.apEWA.textContent = 'R' + (v.apEWA / 100).toFixed(2);
+  valDisplays.apMob.textContent = 'R' + (v.apMob / 100).toFixed(2);
+  valDisplays.apIns.textContent = 'R' + (v.apIns / 100).toFixed(2);
+  valDisplays.gmOS.textContent = fmtPct(v.gmOS);
+  valDisplays.gmEWA.textContent = fmtPct(v.gmEWA);
+  valDisplays.gmMob.textContent = fmtPct(v.gmMob);
+  valDisplays.gmIns.textContent = fmtPct(v.gmIns);
+  valDisplays.jemxRev.textContent = fmtR(v.jemxRev);
+
+  // Product calculations
+  const kuOS = v.ku * (v.arOS / 100);
+  const kuEWA = v.ku * (v.arEWA / 100);
+  const kuMob = v.ku * (v.arMob / 100);
+  const kuIns = v.ku * (v.arIns / 100);
+
+  const revOS = kuOS * (v.apOS / 100);
+  const revEWA = kuEWA * (v.apEWA / 100);
+  const revMob = kuMob * (v.apMob / 100);
+  const revIns = kuIns * (v.apIns / 100);
+  const revJemX = v.jemxRev;
+
+  const gpOS = revOS * (v.gmOS / 100);
+  const gpEWA = revEWA * (v.gmEWA / 100);
+  const gpMob = revMob * (v.gmMob / 100);
+  const gpIns = revIns * (v.gmIns / 100);
+  const gpJemX = revJemX * JEMX_GM;
+
+  const totalRev = revOS + revEWA + revMob + revIns + revJemX;
+  const totalGP = gpOS + gpEWA + gpMob + gpIns + gpJemX;
+  const blendedGM = totalRev > 0 ? (totalGP / totalRev * 100) : 0;
+  const ebitda = totalGP - OPEX;
+  const isPositive = ebitda >= 0;
+
+  // Check if modified
+  let isModified = false;
+  for (const key in DEFAULTS) {
+    if (Math.abs(parseFloat(sliders[key].value) - DEFAULTS[key]) > 0.01) {
+      isModified = true;
+      break;
+    }
+  }
+  document.getElementById('sensModifiedBadge').classList.toggle('show', isModified);
+
+  // ── Update Summary Cards ──
+  document.getElementById('scRevenueChange').textContent = chgPct(CURRENT_REVENUE, totalRev) + ' to ' + fmtR(totalRev);
+
+  const currentGMPct = Math.round(CURRENT_GP / CURRENT_REVENUE * 100);
+  const gmDiff = Math.round(blendedGM) - currentGMPct;
+  document.getElementById('scGMChange').textContent = (gmDiff >= 0 ? '+' : '') + gmDiff + 'pp to ' + Math.round(blendedGM) + '%';
+
+  document.getElementById('scEBITDA').style.color = isPositive ? 'var(--green)' : 'var(--coral)';
+  document.getElementById('scEBITDAChange').textContent = isPositive
+    ? 'Turns positive at ' + fmtR(ebitda)
+    : 'Near breakeven at ' + fmtR(ebitda);
+
+  // ── Update Table ──
+  document.getElementById('tblRevenue').textContent = fmtRFull(totalRev);
+  document.getElementById('tblRevenueChg').textContent = chgPct(CURRENT_REVENUE, totalRev);
+  document.getElementById('tblGM').textContent = Math.round(blendedGM) + '%';
+  document.getElementById('tblGMChg').textContent = (gmDiff >= 0 ? '+' : '') + gmDiff + 'pp';
+  document.getElementById('tblGP').textContent = fmtRFull(totalGP);
+  document.getElementById('tblGPChg').textContent = chgPct(CURRENT_GP, totalGP);
+
+  const tblEbitdaEl = document.getElementById('tblEBITDA');
+  tblEbitdaEl.textContent = fmtRFull(ebitda);
+  tblEbitdaEl.style.color = isPositive ? 'var(--green-dark)' : 'var(--coral)';
+  tblEbitdaEl.className = isPositive ? 'mono ebitda-positive' : 'mono';
+
+  const tblEbitdaChg = document.getElementById('tblEBITDAChg');
+  tblEbitdaChg.textContent = isPositive ? 'Positive' : 'Near breakeven';
+  tblEbitdaChg.style.background = isPositive ? 'var(--coral-20)' : 'rgba(255,64,96,0.15)';
+  tblEbitdaChg.style.color = isPositive ? 'var(--coral)' : '#ff4060';
+
+  // ── Update KU Section ──
+  const newKU = v.ku - CURRENT_KU;
+  document.getElementById('kuTitle').textContent = fmtK(Math.max(0, newKU)) + ' new KU to profitability';
+  document.getElementById('kuDesc').textContent = 'We added 72,000 KU in the last six months. We need ' + fmtK(Math.max(0, newKU)) + ' more to reach ' + fmtK(v.ku) + '.';
+
+  const kuPct = Math.min(100, (CURRENT_KU / v.ku) * 100);
+  document.getElementById('kuBar').style.setProperty('--ku-pct', kuPct.toFixed(1) + '%');
+  document.getElementById('kuTargetLabel').textContent = fmtK(v.ku);
+  document.getElementById('kuTargetStat').textContent = Math.round(v.ku).toLocaleString();
+  document.getElementById('kuNewRequired').textContent = Math.max(0, Math.round(newKU)).toLocaleString();
+
+  // ── Update Product Cards ──
+  document.getElementById('metOSAccess').textContent = fmtPct(v.arOS);
+  document.getElementById('metOSKU').textContent = fmtK(kuOS);
+  document.getElementById('metOSArpku').textContent = 'R' + (v.apOS / 100).toFixed(2);
+  document.getElementById('metOSGM').textContent = fmtPct(v.gmOS);
+  document.getElementById('badgeOS').textContent = chgPct(CURRENT.os.rev, revOS) + ' rev';
+  document.getElementById('barTargetOS').textContent = fmtR(revOS) + ' target';
+  document.getElementById('barFillCurrentOS').style.width = Math.min(100, CURRENT.os.rev / revOS * 100) + '%';
+
+  document.getElementById('metEWAAccess').textContent = fmtPct(v.arEWA);
+  document.getElementById('metEWAKU').textContent = fmtK(kuEWA);
+  document.getElementById('metEWAArpku').textContent = 'R' + (v.apEWA / 100).toFixed(2);
+  document.getElementById('metEWAGM').textContent = fmtPct(v.gmEWA);
+  document.getElementById('badgeEWA').textContent = chgPct(CURRENT.ewa.rev, revEWA) + ' rev';
+  document.getElementById('barTargetEWA').textContent = fmtR(revEWA) + ' target';
+  document.getElementById('barFillCurrentEWA').style.width = Math.min(100, CURRENT.ewa.rev / revEWA * 100) + '%';
+
+  document.getElementById('metMobAccess').textContent = fmtPct(v.arMob);
+  document.getElementById('metMobKU').textContent = fmtK(kuMob);
+  document.getElementById('metMobArpku').textContent = 'R' + (v.apMob / 100).toFixed(2);
+  document.getElementById('metMobGM').textContent = fmtPct(v.gmMob);
+  document.getElementById('badgeMob').textContent = chgPct(CURRENT.mob.rev, revMob) + ' rev';
+  document.getElementById('barTargetMob').textContent = fmtR(revMob) + ' target';
+  const mobBarPct = revMob > 0 ? Math.min(100, CURRENT.mob.rev / revMob * 100) : 0;
+  document.getElementById('barFillCurrentMob').style.width = mobBarPct + '%';
+
+  document.getElementById('metJemXRev').textContent = fmtR(revJemX);
+  document.getElementById('metJemXGP').textContent = fmtR(gpJemX);
+  document.getElementById('badgeJemX').textContent = chgPct(CURRENT.jemx.rev, revJemX) + ' rev';
+  document.getElementById('barTargetJemX').textContent = fmtR(revJemX) + ' target';
+  const jemxBarPct = revJemX > 0 ? Math.min(100, CURRENT.jemx.rev / revJemX * 100) : 0;
+  document.getElementById('barFillCurrentJemX').style.width = jemxBarPct + '%';
+
+  document.getElementById('metInsAccess').textContent = fmtPct(v.arIns);
+  document.getElementById('metInsKU').textContent = fmtK(kuIns);
+  document.getElementById('metInsArpku').textContent = 'R' + (v.apIns / 100).toFixed(2);
+  document.getElementById('metInsGM').textContent = fmtPct(v.gmIns);
+  document.getElementById('badgeIns').textContent = revIns > 0 ? (CURRENT.ins.rev === 0 ? 'New' : chgPct(CURRENT.ins.rev, revIns) + ' rev') : 'New product';
+  document.getElementById('barTargetIns').textContent = fmtR(revIns) + ' target';
+
+  // ── Update Revenue Chart ──
+  revenueChart.data.datasets[1].data = [
+    Math.round(revOS), Math.round(revEWA), Math.round(revMob),
+    Math.round(revJemX), Math.round(revIns)
+  ];
+  revenueChart.update('none');
+
+  // ── Update Waterfall ──
+  const maxBarH = 260;
+  const gpH = totalRev > 0 ? (totalGP / totalRev) * maxBarH : 0;
+  const opexH = totalRev > 0 ? (OPEX / totalRev) * maxBarH : 0;
+  const ebitdaH = totalRev > 0 ? Math.max(4, Math.abs(ebitda) / totalRev * maxBarH) : 4;
+
+  document.getElementById('wfRev').style.height = maxBarH + 'px';
+  document.getElementById('wfGp').style.height = Math.max(0, gpH) + 'px';
+  document.getElementById('wfOpex').style.height = opexH + 'px';
+  document.getElementById('wfEbitda').style.height = ebitdaH + 'px';
+  document.getElementById('wfEbitda').classList.toggle('negative-ebitda', !isPositive);
+
+  document.getElementById('wfRevVal').textContent = fmtR(totalRev);
+  document.getElementById('wfGpVal').textContent = fmtR(totalGP);
+  document.getElementById('wfOpexVal').textContent = '-' + fmtR(OPEX);
+  document.getElementById('wfEbitdaVal').textContent = fmtR(ebitda);
+
+  // ── Update Bridge description ──
+  document.getElementById('bridgeDesc').textContent = fmtR(totalRev) + ' revenue, ' + Math.round(blendedGM) + '% gross margin, lean opex. ' + (isPositive ? 'The maths works.' : 'Near breakeven.');
+
+  // ── Update EBITDA celebration ──
+  document.getElementById('ebitdaValue').textContent = fmtRFull(ebitda);
+  document.getElementById('ebitdaValue').classList.toggle('negative', !isPositive);
+  document.getElementById('ebitdaSub').textContent = isPositive
+    ? 'Sustainably profitable. The inflection point.'
+    : 'R' + Math.round(Math.abs(ebitda)).toLocaleString() + ' from breakeven. Almost there.';
+
+  // ── Update Panel EBITDA readout ──
+  const panelEbitda = document.getElementById('panelEbitda');
+  panelEbitda.textContent = fmtRFull(ebitda);
+  panelEbitda.className = 'sp-ebitda-value ' + (isPositive ? 'positive' : 'negative');
+  document.getElementById('panelEbitdaSub').textContent = isPositive
+    ? 'Above breakeven'
+    : fmtR(Math.abs(ebitda)) + ' below breakeven';
+}
+
+// ── Attach listeners ──
+for (const key in sliders) {
+  sliders[key].addEventListener('input', recalculate);
+}
+
+// ── Reset ──
+document.getElementById('sensReset').addEventListener('click', () => {
+  for (const key in DEFAULTS) {
+    sliders[key].value = DEFAULTS[key];
+  }
+  recalculate();
+});
+
+// ── Scroll reveal ──
+const reveals = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(el => revealObserver.observe(el));
+
+// ── Nav visibility ──
+const navEl = document.getElementById('nav');
+const heroEl = document.getElementById('hero');
+new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    navEl.classList.toggle('visible', !entry.isIntersecting);
+  });
+}, { threshold: 0.3 }).observe(heroEl);
+
+// ── Active nav link ──
+const sectionEls = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav .nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sectionEls.forEach(section => {
+    if (scrollY >= section.offsetTop - 100) current = section.getAttribute('id');
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+});
+
+// ── KU Bar animation ──
+const kuBar = document.getElementById('kuBar');
+new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) { kuBar.classList.add('animated'); obs.unobserve(entry.target); }
+  });
+}, { threshold: 0.5 }).observe(kuBar);
+
+// ── Waterfall animation ──
+const waterfall = document.getElementById('waterfall');
+const wfBars = waterfall.querySelectorAll('.wf-bar');
+const wfVals = waterfall.querySelectorAll('.wf-value');
+new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      wfBars.forEach((bar, i) => setTimeout(() => bar.classList.add('animated'), i * 200));
+      setTimeout(() => wfVals.forEach(v => v.classList.add('visible')), 800);
+      obs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 }).observe(waterfall);
+
+// ── Particles ──
+const particleContainer = document.getElementById('particles');
+new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.style.cssText = `position:absolute;left:${Math.random()*100}%;top:${Math.random()*100}%;width:${2+Math.random()*4}px;height:${2+Math.random()*4}px;border-radius:50%;background:var(--coral);opacity:0;animation:particleFade ${1.5+Math.random()*2}s ${Math.random()}s ease-out forwards;`;
+        particleContainer.appendChild(p);
+      }
+      obs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 }).observe(document.getElementById('ebitdaCelebration'));
+
+const pStyle = document.createElement('style');
+pStyle.textContent = `@keyframes particleFade { 0%{opacity:0;transform:scale(0) translateY(0)} 30%{opacity:0.6} 100%{opacity:0;transform:scale(1) translateY(-40px)} }`;
+document.head.appendChild(pStyle);
+
+// Initial calc
+recalculate();
+</script>
+</body>
+</html>
