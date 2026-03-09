@@ -8,6 +8,73 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
 <style>
+/* ── Password Gate ── */
+#password-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #183247;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+#password-gate.hidden { display: none; }
+#password-gate .pg-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+#password-gate .pg-sub {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 2rem;
+}
+#password-gate .pg-form {
+  display: flex;
+  gap: 0.5rem;
+}
+#password-gate input {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  width: 240px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#password-gate input::placeholder { color: rgba(255,255,255,0.3); }
+#password-gate input:focus { border-color: #ff697f; }
+#password-gate input.error {
+  border-color: #ff4060;
+  animation: shake 0.4s ease;
+}
+#password-gate button {
+  background: #ff697f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#password-gate button:hover { background: #ff8fa0; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+#dashboard-content { display: none; }
+#dashboard-content.unlocked { display: block; }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
@@ -987,6 +1054,18 @@ section {
 </head>
 <body>
 
+<!-- Password Gate -->
+<div id="password-gate">
+  <div class="pg-logo">Jem</div>
+  <div class="pg-sub">Enter password to view dashboard</div>
+  <div class="pg-form">
+    <input type="password" id="pgInput" placeholder="Password" autofocus>
+    <button onclick="checkPassword()">Enter</button>
+  </div>
+</div>
+
+<div id="dashboard-content">
+
 <!-- Sensitivity Panel -->
 <button class="sens-toggle" id="sensToggle" title="Sensitivity Analysis">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M6 20V4"/><path d="M18 20v-6"/></svg>
@@ -1911,6 +1990,26 @@ document.head.appendChild(pStyle);
 
 // Initial calc
 recalculate();
+</script>
+
+</div><!-- end dashboard-content -->
+
+<script>
+function checkPassword() {
+  const input = document.getElementById('pgInput');
+  if (input.value === 'Profitability2027') {
+    document.getElementById('password-gate').classList.add('hidden');
+    document.getElementById('dashboard-content').classList.add('unlocked');
+  } else {
+    input.classList.add('error');
+    input.value = '';
+    input.placeholder = 'Incorrect password';
+    setTimeout(() => input.classList.remove('error'), 400);
+  }
+}
+document.getElementById('pgInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkPassword();
+});
 </script>
 </body>
 </html>
